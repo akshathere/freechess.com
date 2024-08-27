@@ -8,6 +8,7 @@ export default {
     extend: {
       colors:{
         "blacki":"#302E2B",
+        "lblacki" : "#3C3B39",
         "green":"#81B64C",
         "green-l":"#ECECD0",
         "d-green":"#779557",

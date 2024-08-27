@@ -1,73 +1,138 @@
 import { Color, PieceSymbol, Square } from "chess.js";
 import { useState } from "react";
+import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 /*eslint-disable*/
-// import B from "../assets/B copy.png"
-// import K from "../assets/K copy.png"
-// import R from "../assets/R copy.png"
-// import N from "../assets/N copy.png"
-// import Q from "../assets/Q copy.png"
-// import P from "../assets/P copy.png"
-// import b from "../assets/b.png"
-// import k from "../assets/k.png"
-// import r from "../assets/r.png"
-// import n from "../assets/n.png"
-// import q from "../assets/q.png"
-// import p from "../assets/p.png"
-export default function Chessboard({chess, board ,socket,setBoard}: {
-    chess:any;
+export default function Chessboard({
+    chess,
+    started,
+    board,
+    socket,
+    setBoard,
+}: {
+    chess: any,
+    started: boolean,
     board: ({
-    square: Square;
-    type: PieceSymbol;
-    color: Color;
-} | null)[][],socket: WebSocket,setBoard: any,}) {
-    const [to,setTo] =useState<null | Square>(null)
-    const [from,setFrom] =useState<null | Square>(null)
-    // setTo(null)
-  return<div className="text-black">
-        {board.map((row,i)=>{
-            return <div key={i} className="flex ">
-                {row.map((square,j)=>{
-                    const squareRepresentation = String.fromCharCode(97+(j%8))+""+(8-i) as Square
-                    return<div onClick={()=>{
-                        if(!from){
-                            setFrom(squareRepresentation)
-                        }else{
-                            socket.send(JSON.stringify({
-                                type:"move",
-                                payload:{
-                                    move:{
-                                        from,
-                                        to:squareRepresentation
-                                    }          
+        square: Square;
+        type: PieceSymbol;
+        color: Color;
+    } | null)[][];
+    socket: WebSocket;
+    setBoard: any
+}) {
+    const [from, setFrom] = useState<null | Square>(null);
+
+    function DraggablePiece({ square, squareRepresentation }: {
+        square: { square: Square; type: PieceSymbol; color: Color } | null;
+        squareRepresentation: Square;
+    }) {
+        const { attributes, listeners, setNodeRef, transform } = useDraggable({
+            id: squareRepresentation,
+            disabled: !started,  // Disable dragging if the game hasn't started
+        });
+        const style = transform ? {
+            transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        } : undefined;
+
+        return (
+            <div
+                ref={setNodeRef}
+                style={style}
+                {...listeners}
+                {...attributes}
+                className="h-full justify-center flex flex-col"
+            >
+                {square ? (
+                    <img
+                        className="w-18"
+                        src={`/${square?.color === "b"
+                            ? square?.type.toUpperCase()
+                            : `${square?.type?.toUpperCase()} copy`
+                            }.png`}
+                    />
+                ) : null}
+            </div>
+        );
+    }
+
+    function DroppableSquare({ square, squareRepresentation }: {
+        square: { square: Square; type: PieceSymbol; color: Color } | null;
+        squareRepresentation: Square;
+    }) {
+        const { setNodeRef } = useDroppable({
+            id: squareRepresentation,
+            disabled: !started,  // Disable dropping if the game hasn't started
+        });
+
+        return (
+            <div
+                ref={setNodeRef}
+                onDrop={() => {
+                    if (started && from) {  // Only allow drop if the game has started
+                        socket.send(JSON.stringify({
+                            type: "move",
+                            payload: {
+                                move: {
+                                    from,
+                                    to: squareRepresentation
                                 }
-                            }))
-                            setFrom(null)
-                            chess.move({
-                                from,
-                                to:squareRepresentation
-                            })
-                            setBoard(chess.board())
-                            setTo(squareRepresentation)
-                            console.log({
-                                from,
-                                to
-                            })
-                               
-                        }
-                    }}
-                    key={j} className={`w-20 h-20 ${(i+j)%2==0 ? 'bg-d-green' : 'bg-peach'} `}>
-                        <div className="w-full flex justify-center  h-full">
-                            <div className="h-full justify-center flex flex-col">
-                                
-                            {square ?  <img className="w-7"  src={`/${square?.color=== "b" ?
-                            square?.type : `${square?.type?.toUpperCase()} copy`}.png`}/> : null}
-                            </div>
-                        </div>
-                    </div>
-                
-                })}
+                            }
+                        }));
+                        chess.move({
+                            from,
+                            to: squareRepresentation
+                        });
+                        setBoard(chess.board());
+                        setFrom(null);
+                    } else if (started) {
+                        setFrom(squareRepresentation);
+                    }
+                }}
+                className={`w-20 h-20 ${(squareRepresentation.charCodeAt(0) + parseInt(squareRepresentation[1])) % 2 === 0 ? 'bg-d-green' : 'bg-peach'} `}
+            >
+                <div className="w-full flex justify-center h-full">
+                    <DraggablePiece square={square} squareRepresentation={squareRepresentation} />
                 </div>
-        })}
-    </div>
-  
+            </div>
+        );
+    }
+
+    return (
+        <DndContext onDragEnd={({ active, over }) => {
+            if (started && over && active.id !== over.id) {  // Only process the drag end if the game has started
+                setFrom(active.id as Square);
+                const toSquare = over.id as Square;
+                socket.send(JSON.stringify({
+                    type: "move",
+                    payload: {
+                        move: {
+                            from: active.id as Square,
+                            to: toSquare
+                        }
+                    }
+                }));
+                chess.move({
+                    from: active.id as Square,
+                    to: toSquare
+                });
+                setBoard(chess.board());
+            }
+        }}>
+            <div className="text-black">
+                {board.map((row, i) => (
+                    <div key={i} className="flex">
+                        {row.map((square, j) => {
+                            const squareRepresentation = String.fromCharCode(97 + (j % 8)) + "" + (8 - i) as Square;
+                            return (
+                                <DroppableSquare
+                                    key={j}
+                                    square={square}
+                                    squareRepresentation={squareRepresentation}
+                                />
+                            );
+                        })}
+                    </div>
+                ))}
+            </div>
+        </DndContext>
+    );
 }
