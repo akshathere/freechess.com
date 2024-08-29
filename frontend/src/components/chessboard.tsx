@@ -49,7 +49,7 @@ export default function Chessboard({
                             : `${square?.type?.toUpperCase()} copy`
                             }.png`}
                     />
-                ) : null}
+                ) : null }
             </div>
         );
     }
