@@ -5,7 +5,7 @@ import useSocket from "../hooks/UseSocket";
 import timer from "../assets/timer.png";
 import { Chess } from "chess.js";
 import BButton from "../components/bbutton";
-import TimerClock from "../components/TimeClock";
+// import TimerClock from "../components/TimeClock";
 
 const INIT_GAME = "init_game";
 const MOVE = "move";
@@ -82,7 +82,7 @@ export default function Game() {
                                    <p className="text-2xl font-bold">Play</p> 
                                 </Button>
                             )}
-                            <TimerClock started={started}></TimerClock>
+                            {/* <TimerClock started={started}></TimerClock> */}
                         </div>
                     </div>
                 </div>
