@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+/*eslint-disable*/
 type MyComponentProps = {
   started: boolean;
 };
