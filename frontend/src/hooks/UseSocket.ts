@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Update the WebSocket URL with the new IP address and port
-const WS_URL = "ws://13.201.30.89";
+const WS_URL = "wss://superficial-kindhearted-sense.glitch.me/";
 
 export default function useSocket() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
