@@ -3,8 +3,6 @@ import { GameManager } from './gamemanager';
 
 const wss = new WebSocketServer({ port: 8080 });
 const gamemanager=new GameManager();
-
-import url from 'url';
 import { extractAuthUser } from './auth';
 
 // Function to parse cookies from the request header
@@ -22,13 +20,8 @@ function parseCookies(cookieHeader :any) {
 wss.on('connection', function connection(ws,req) {
   //@ts-ignore
   console.log(req.body);
-  const cookieHeader = req.headers.cookie;
-    const cookies = parseCookies(cookieHeader);
-
-    // Extract the token cookie
-    //@ts-ignore
-    const token = cookies.token;
-
+  const url = req.url ?? '';
+  const token = new URLSearchParams(url.split('?')[1]).get('token') ?? '';
         // Extract authenticated user from the token
   const user = extractAuthUser(token); // Use the token as before
   console.log(user)

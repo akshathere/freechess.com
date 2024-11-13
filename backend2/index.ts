@@ -1,11 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
-import { signIn, signup } from "./authentication/index";
+import { authenticateUser } from "./authentication/index";
 import cors from 'cors'
 const app = express();
-
-console.log("error k ha-1")
-app.use(cors());
-console.log("error k ha0")
+app.use(cors({
+    origin: 'http://localhost:5173', // Update with your frontend URL
+    credentials: true, // Allow credentials (cookies, authorization headers)
+  }));
 app.use(express.json());
 
 // Wrapper to handle async errors
@@ -13,8 +13,8 @@ const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextF
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 console.log("error k ha")
-app.post("/signup", asyncHandler(signup));
-app.post("/signin", asyncHandler(signIn));
+app.post("/signup", asyncHandler(authenticateUser));
+app.post("/signin", asyncHandler(authenticateUser));
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);

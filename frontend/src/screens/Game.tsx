@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import Button from "../components/button";
 import Chessboard from "../components/chessboard";
 import useSocket from "../hooks/UseSocket";
-import timer from "../assets/timer.png";
+// import timer from "../assets/timer.png";
 import { Chess } from "chess.js";
-import BButton from "../components/bbutton";
-// import TimerClock from "../components/TimeClock";
+// import BButton from "../components/bbutton";
 
 const INIT_GAME = "init_game";
 const MOVE = "move";
@@ -64,11 +63,11 @@ export default function Game() {
                             />
                         </div>
                         <div className="md:col-span-2 flex flex-col items-center md:items-start">
-                            <BButton onClick={() => console.log("do nothing")}>
+                            {/* <BButton onClick={() => console.log("do nothing")}>
                                 <div className="flex px-4 lg:px-16">
                                     <img src={timer} className="w-40 lg:w-52" alt="timer" />
                                 </div>
-                            </BButton>
+                            </BButton> */}
                             {!started && (
                                 <Button
                                     onClick={() => {

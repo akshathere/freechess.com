@@ -87,7 +87,7 @@ export default function Chessboard({
                         setFrom(squareRepresentation);
                     }
                 }}
-                className={`w-20 h-20 ${(squareRepresentation.charCodeAt(0) + parseInt(squareRepresentation[1])) % 2 === 0 ? 'bg-d-green' : 'bg-peach'} `}
+                className={`w-20 h-20 ${(squareRepresentation.charCodeAt(0) + parseInt(squareRepresentation[1])) % 2 === 0 ? 'bg-red-600' : 'bg-black'} `}
             >
                 <div className="w-full flex justify-center h-full">
                     <DraggablePiece square={square} squareRepresentation={squareRepresentation} />
